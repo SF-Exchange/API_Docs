@@ -45,7 +45,7 @@ $symbol = 'BTC_USDT';
 $nonce = time();
 $payload = ['nonce' => $nonce, 'symbol' => $symbol, 'page' => 1, 'size' => 10];
 $payload_str = http_build_query($payload, '', '&');
-$sign = base64_encode(hash_hmac('sha256', urldecode($payload_str).$secret, true));
+$sign = base64_encode(hash_hmac('sha256', urldecode($payload_str), $secret, true));
 $headers = ['Content-Type' => 'application/json', 'version'=> '2.0', 'key' => $key, 'sign' => $sign];
 $response = Requests::post($url, $headers, json_encode($payload));
 ```
