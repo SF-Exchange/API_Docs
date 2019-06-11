@@ -36,6 +36,66 @@ headers = {'Content-Type': 'application/json', 'version': '2.0', 'key': key, 'si
 response = requests.post(url, data=json.dumps(payload), headers=headers)
 ```
 
+Java:
+```Java
+import sun.misc.BASE64Encoder;
+import com.sun.deploy.net.URLEncoder;
+import java.util.*;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+public class test<main> {
+    public static void main(String[] args){
+        try{
+            String key = "your key";
+            String secret = "your secret";
+            String url = "https://api.sfex.net/order/active";
+            String symbol = "BTC_USDT";
+            Long nonce = new Date().getTime() / 1000;
+            Map<String, Object> data = new HashMap<String, Object>(){
+                {
+                    put("nonce", nonce);
+                    put("symbol", symbol);
+                    put("page", 1);
+                    put("size", 10);
+                }
+            };
+            String payload_str = getUrlStr(data);
+            String sign = generateSign(secret, payload_str);
+            Map<String, String> headers = new HashMap<String, String>(){
+                {
+                    put("Content-Type", "application/json");
+                    put("version", "2.0");
+                    put("key", key);
+                    put("sign", sign);
+                }
+            };
+            // HTTP请求
+        }
+        catch(Exception ex){}
+    }
+
+    private static String generateSign(String privateKey, String signStr) throws Exception{
+        Mac sha256 = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secretKey = new SecretKeySpec(privateKey.getBytes("UTF-8"), "HmacSHA256");
+        sha256.init(secretKey);
+        byte[] array = sha256.doFinal(signStr.getBytes("UTF-8"));
+        return new BASE64Encoder().encode(array) ;
+    }
+
+    private static String getUrlStr(Map<String, Object> params) throws Exception{
+        StringBuilder postData = new StringBuilder();
+        for (Map.Entry<String,Object> param : params.entrySet()) {
+            if (postData.length() != 0) postData.append('&');
+            postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+            postData.append('=');
+            postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+        }
+        return postData.toString();
+    }
+}
+```
+
 PHP：
 ``` PHP
 $key = 'your key'
